@@ -1,35 +1,51 @@
 # MetService CAP MCP Server
 
-A lightweight edge‑compatible MCP server built with **Hono**, **TypeScript**, and **Zod** that consumes the MetService CAP Atom feed.
+An edge-compatible Model Context Protocol (MCP) server built with **Hono**,
+**mcp-handler**, **TypeScript**, and **Zod**. It fetches the public MetService
+CAP Atom feed at <https://alerts.metservice.com/cap/atom>, parses it with
+`fast-xml-parser`, and exposes the current alerts as MCP tools.
 
-## Endpoints
+This project follows the structure of Vercel's
+`examples/starter/hono-mcp` template and is configured for Vercel Edge
+deployment.
 
-- `GET /get_all_alerts` – Returns all active CAP alerts in JSON.
-- `GET /get_active_road_warnings` – Returns road‑specific snowfall or weather warnings for **SH1 (Desert Road)**. If none are active, a clear status message is returned.
+## MCP endpoint
 
-## Architecture
+- `POST /mcp` - Streamable HTTP MCP endpoint.
+- `GET /` - Basic server discovery response.
 
-- **Hono** provides the ultra‑fast Edge runtime server.
-- **fast-xml-parser** parses the Atom XML feed in an edge‑compatible way (no Node‑only APIs).
-- **mcp‑handler** (placeholder) would expose these routes as MCP tools when deployed on Vercel.
+## Tools
 
-## Deploy
+### `get_active_road_warnings`
 
-```bash
-# Install dependencies
-yarn install
-# Deploy to Vercel (requires Vercel CLI and login)
-vercel deploy --prod
-```
+Fetches the live MetService CAP Atom feed and returns active warnings targeting
+**SH1 Desert Road**. If none are active, the tool returns a `clear` status.
 
-The `vercel.json` forces the function to run on the Edge runtime.
+### `get_all_alerts`
+
+Fetches the live MetService CAP Atom feed and returns all active alert entries
+with normalized Atom/CAP fields and the raw parsed entry.
 
 ## Development
 
 ```bash
-vercel dev   # Local Edge‑compatible dev server
+npm install
+npm run typecheck
+npm run dev
 ```
 
----
+Point MCP clients at:
 
-*Built using the `vercel/examples/starter/hono-mcp` structure as a reference.*
+```text
+http://localhost:3000/mcp
+```
+
+## Deploy
+
+```bash
+npm install
+npm run build
+vercel deploy --prod
+```
+
+`vercel.json` configures the Hono entrypoint for Vercel Edge runtime.
