@@ -3,8 +3,13 @@ import { XMLParser } from 'fast-xml-parser'
 export const METSERVICE_CAP_ATOM_URL = 'https://alerts.metservice.com/cap/atom'
 
 type XmlPrimitive = string | number | boolean | null | undefined
-type XmlValue = XmlPrimitive | XmlObject | XmlValue[]
-type XmlObject = Record<string, XmlValue>
+type XmlValue = XmlPrimitive | XmlObject | XmlArray
+
+interface XmlArray extends Array<XmlValue> {}
+
+interface XmlObject {
+  [key: string]: XmlValue
+}
 
 export interface AtomLink {
   href: string
